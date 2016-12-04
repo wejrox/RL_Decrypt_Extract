@@ -33,7 +33,8 @@ namespace RL_Decrypt_Extract
         {
             decryptFiles();
             moveFiles();
-            extractMeshes(); 
+            extractMeshes();
+            MessageBox.Show("Extraction Completed.", "Done");
         }
 
         private void decryptFiles()
@@ -52,6 +53,21 @@ namespace RL_Decrypt_Extract
             }
         }
 
+        private void btnDeleteEncrypted_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to delete your UPK? \nTHIS CANNOT BE UNDONE!", "Warning", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                string[] files = null;
+                try
+                {
+                    files = Directory.GetFiles(Application.StartupPath, "*.upk");
+                } catch (Exception){ }
+
+                foreach(string s in files)
+                    System.IO.File.Delete(s);
+            }
+        }
+
         // Moves all decrypted files into a separate folder (named 'decrypted')
         private void moveFiles()
         {
@@ -61,9 +77,9 @@ namespace RL_Decrypt_Extract
 
             Directory.CreateDirectory(decDir);
 
-            // Allocate 1500ms for each file to be created (varying file sizes are not accounted for)
-            int timeToSleep = encFiles.Count() * 1500;
-            MessageBox.Show("Waiting " + timeToSleep / 1500 + " seconds before continuing, to allow decryption", "Click OK");
+            // Allocate 5 seconds for files to be created (varying file sizes are not accounted for)
+            int timeToSleep = 5000;
+            MessageBox.Show("Waiting " + timeToSleep / 1000 + " seconds before continuing, to allow decryption", "Click OK");
             Thread.Sleep(timeToSleep);
 
             try
@@ -110,7 +126,7 @@ namespace RL_Decrypt_Extract
                 string f = s;
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.FileName = Application.StartupPath + @"\umodel.exe";
-                startInfo.Arguments = "-export \"" +@s + "\" -out=\"" + extDir + "\"";
+                startInfo.Arguments = "-noanim -export \"" +@s + "\" -out=\"" + extDir + "\"";
                 Console.WriteLine(startInfo.Arguments);
                 Process.Start(startInfo);
             }
